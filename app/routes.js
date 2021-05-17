@@ -5,7 +5,7 @@ const express = require("express");
 const router = express.Router();
 
 // Home Default
-router.get("/", (req, res) => res.json({ KITE: "ACTIVE" }));
+router.get("/", (req, res) => res.json({ ALPER: "ACTIVE" }));
 
 //uploads
 router.use("/files", express.static("uploads"));
