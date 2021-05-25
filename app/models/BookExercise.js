@@ -1,18 +1,18 @@
-'use strict';
+"use strict";
 
 module.exports = (sequelize, DataTypes) => {
-
-  const BookEx = sequelize.define('BookEx', {
-    id: {
+  const BookEx = sequelize.define(
+    "BookEx",
+    {
+      id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: DataTypes.INTEGER
+        type: DataTypes.INTEGER,
       },
       bookId: {
         type: DataTypes.INTEGER,
-        references: { model: 'books', key: 'id' }
-
+        references: { model: "books", key: "id" },
       },
       exerciseImg: {
         type: DataTypes.STRING,
@@ -23,16 +23,19 @@ module.exports = (sequelize, DataTypes) => {
       exerciseAttainmentName: {
         type: DataTypes.STRING,
       },
-      exerciseAttainmentName: {
+      exerciseAttainmentDes: {
+        type: DataTypes.STRING,
+      },
+      contScore: {
         type: DataTypes.REAL,
       },
-
-  }, {
-    tableName: "bookexercises",
-    paranoid: true,
-    timestamps: true,
-  });
-
+    },
+    {
+      tableName: "bookexercises",
+      paranoid: true,
+      timestamps: true,
+    }
+  );
 
   BookEx.associate = (models) => {
     BookEx.belongsTo(models.Book, {
@@ -43,7 +46,6 @@ module.exports = (sequelize, DataTypes) => {
       as: "books",
     });
   };
-
 
   return BookEx;
 };

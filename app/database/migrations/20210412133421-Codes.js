@@ -1,27 +1,27 @@
-'use strict';
+"use strict";
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-   
-    return queryInterface.createTable('codes', {
+    return queryInterface.createTable("codes", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       bookRegistrationCode: {
         type: Sequelize.STRING,
-       
       },
       isUsed: {
         type: Sequelize.BOOLEAN,
-       defaultValue : false,
+        defaultValue: false,
+      },
+      bookId: {
+        type: Sequelize.INTEGER,
+        references: { model: "books", key: "id" },
       },
     });
   },
 
-  down: async (queryInterface, Sequelize) => {
-   
-  }
+  down: async (queryInterface, Sequelize) => {},
 };
