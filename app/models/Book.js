@@ -13,9 +13,6 @@ module.exports = (sequelize, DataTypes) => {
       bookName: {
         type: DataTypes.STRING,
       },
-      bookCoverImage: {
-        type: DataTypes.STRING,
-      },
     },
     {
       tableName: "books",

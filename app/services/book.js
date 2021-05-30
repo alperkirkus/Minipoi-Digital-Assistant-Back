@@ -17,6 +17,22 @@ const app = express.Router();
 
 //**************Route Level 1
 
+app.get("/all", async (req, res) => {
+  db.Book.findAll()
+    .then((books) => {
+      return res.json({
+        type: true,
+        books,
+      });
+    })
+    .catch((e) => {
+      return res.json({
+        type: false,
+        data: e.toString(),
+      });
+    });
+});
+
 //get user book by id
 app.get("/:userId", async (req, res) => {
   console.log(req.params, "wwww");
