@@ -33,6 +33,7 @@ app.post("/add-book", async (req, res) => {
         db.UBook.findOne({
           where: {
             bookId: code.bookId,
+            userId,
           },
         }).then((ubook) => {
           if (ubook) {
