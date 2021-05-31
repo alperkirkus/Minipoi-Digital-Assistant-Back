@@ -1,17 +1,19 @@
-"use strict";
+'use strict';
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    return queryInterface.createTable("bookexercises", {
+   
+    return queryInterface.createTable('bookexercises', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.INTEGER
       },
       bookId: {
         type: Sequelize.INTEGER,
-        references: { model: "books", key: "id" },
+        references: { model: 'books', key: 'id' }
+
       },
       exerciseImg: {
         type: Sequelize.STRING,
@@ -31,5 +33,7 @@ module.exports = {
     });
   },
 
-  down: async (queryInterface, Sequelize) => {},
+  down: async (queryInterface, Sequelize) => {
+   
+  }
 };

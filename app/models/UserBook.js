@@ -1,30 +1,29 @@
-"use strict";
+'use strict';
 
 module.exports = (sequelize, DataTypes) => {
-  const UBook = sequelize.define(
-    "UBook",
-    {
-      id: {
+
+  const UBook = sequelize.define('UBook', {
+    id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER
       },
       userId: {
         type: DataTypes.INTEGER,
-        references: { model: "users", key: "id" },
+        references: { model: 'users', key: 'id' }
       },
       bookId: {
         type: DataTypes.INTEGER,
-        references: { model: "books", key: "id" },
+        references: { model: 'books', key: 'id' }
       },
-    },
-    {
-      tableName: "usersbooks",
-      paranoid: false,
-      timestamps: false,
-    }
-  );
+
+  }, {
+    tableName: "usersbooks",
+    paranoid: false,
+    timestamps: false,
+  });
+
 
   UBook.associate = (models) => {
     UBook.belongsTo(models.User, {
@@ -36,13 +35,14 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     UBook.belongsTo(models.Book, {
-      foreignKey: {
-        name: "bookId",
-        allowNull: false,
-      },
-      as: "books",
-    });
+        foreignKey: {
+          name: "bookId",
+          allowNull: false,
+        },
+        as: "books",
+      });
   };
+
 
   return UBook;
 };

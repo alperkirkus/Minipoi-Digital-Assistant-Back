@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       bookId: {
         type: DataTypes.INTEGER,
-        references: { model: "books", key: "id" },
+        references: { model: 'books', key: 'id' }
       },
     },
     {
@@ -28,6 +28,7 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: false,
     }
   );
+
 
   Code.associate = (models) => {
     Code.belongsTo(models.Book, {

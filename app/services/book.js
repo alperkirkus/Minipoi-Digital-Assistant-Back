@@ -17,8 +17,15 @@ const app = express.Router();
 
 //**************Route Level 1
 
-app.get("/all", async (req, res) => {
-  db.Book.findAll()
+
+
+
+
+app.get(
+  "/all",
+  async (req, res) => {
+   
+    db.Book.findAll()
     .then((books) => {
       return res.json({
         type: true,
@@ -31,23 +38,28 @@ app.get("/all", async (req, res) => {
         data: e.toString(),
       });
     });
-});
+  }
+  
+);
 
 //get user book by id
-app.get("/:userId", async (req, res) => {
-  console.log(req.params, "wwww");
-  db.UBook.findAll({
-    where: {
-      userId: req.params.userId,
-    },
-    include: [
-      {
-        model: db.Book,
-        as: "books",
-        required: true,
+app.get(
+  "/:userId",
+  async (req, res) => {
+   
+
+    
+    console.log(req.params,"wwww")
+    db.UBook.findAll({
+      where:{
+        userId :  req.params.userId
       },
-    ],
-  })
+      include : [{
+        model: db.Book,
+        as : "books",
+        required: true
+       }]
+    })
     .then((ubook) => {
       return res.json({
         type: true,
@@ -60,6 +72,10 @@ app.get("/:userId", async (req, res) => {
         data: e.toString(),
       });
     });
-});
+  }
+  
+);
+
+
 
 module.exports = app;

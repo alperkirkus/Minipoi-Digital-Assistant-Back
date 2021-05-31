@@ -17,64 +17,80 @@ const app = express.Router();
 
 //**************Route Level 1
 
-//add book with code
-app.post("/add-book", async (req, res) => {
-  const { userId, code } = req.body;
 
-  let usedCode = code;
-  db.Code.findOne({
-    where: {
-      bookRegistrationCode: code,
-      isUsed: false,
-    },
-  })
+
+
+//add book with code
+app.post(
+  "/add-book",
+  async (req, res) => {
+   
+    const{userId,code} = req.body
+
+let usedCode = code
+    db.Code.findOne({
+      where:{
+        bookRegistrationCode:code,
+        isUsed:false,
+      }
+    })
     .then((code) => {
-      if (code) {
+      if(code)
+      {
+
         db.UBook.findOne({
-          where: {
-            bookId: code.bookId,
+          where:{
+            bookId:code.bookId,
             userId,
-          },
-        }).then((ubook) => {
-          if (ubook) {
+          }
+        }).then((ubook)=>{
+
+          if(ubook)
+          {
             return res.json({
               type: false,
               msg: "Code already uses",
             });
-          } else {
+
+          }else{
+
+
             db.UBook.create({
               userId,
-              bookId: code.bookId,
-            })
-              .then(() => {
-                db.Code.update(
-                  { isUsed: true },
-                  {
-                    where: {
-                      bookRegistrationCode: usedCode,
-                    },
-                  }
-                ).then(() => {
-                  return res.json({
-                    type: true,
-                    msg: "success",
-                  });
-                });
-              })
-              .catch((e) => {
+              bookId:code.bookId
+            }).then(()=>{
+    
+              db.Code.update({isUsed:true},{
+                where :{
+                  bookRegistrationCode:usedCode,
+                }
+              }).then(()=>{
                 return res.json({
-                  type: false,
-                  data: e.toString(),
+                  type: true,
+                  msg: "success",
                 });
+    
+              })
+            
+            }) .catch((e) => {
+              return res.json({
+                type: false,
+                data: e.toString(),
               });
+            });
           }
-        });
-      } else {
+
+        })
+  
+
+      }
+      else{
         return res.json({
           type: false,
           msg: "Code already uses",
         });
       }
+      
     })
     .catch((e) => {
       return res.json({
@@ -82,22 +98,31 @@ app.post("/add-book", async (req, res) => {
         data: e.toString(),
       });
     });
-});
+  }
+  
+);
 
-app.post("/add", async (req, res) => {
-  const { bookId, codes } = req.body;
 
-  //preparing
+app.post(
+  "/add",
+  async (req, res) => {
 
-  let data = [];
-  codes.forEach((el) => {
-    data.push({
-      bookRegistrationCode: el,
-      bookId,
+    const {bookId,codes} = req.body
+
+
+
+    //preparing
+
+    let data =[]
+    codes.forEach(el => {
+      
+      data.push({
+        bookRegistrationCode:el,
+        bookId,
+      })
     });
-  });
 
-  db.Code.bulkCreate(data)
+    db.Code.bulkCreate(data)
     .then(() => {
       return res.json({
         type: true,
@@ -109,6 +134,11 @@ app.post("/add", async (req, res) => {
         data: e.toString(),
       });
     });
-});
+  }
+  
+);
+
+
+
 
 module.exports = app;

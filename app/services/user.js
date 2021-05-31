@@ -17,120 +17,139 @@ const app = express.Router();
 
 //**************Route Level 1
 
+
+
+
 //get user by id
-app.get("/me", auth([UserRolls.Admin, UserRolls.User]), async (req, res) => {
-  if (req.user) {
-    return res.json({
-      status: 1,
-      user: req.user,
-    });
-  } else {
-    return res.status(401).json({ msg: "There is no matching" });
+app.get(
+  "/me",auth([UserRolls.Admin,UserRolls.User]),
+  async (req, res) => {
+   
+    if(req.user)
+    {
+      return res.json({
+        status:1,
+        user: req.user,
+      });
+    }
+    else{
+      return res.status(401).json({ msg: "There is no matching" });
+    }
   }
-});
+);
 
 //get user by id
-app.get("/:id", async (req, res) => {
-  const id = req.params.id;
-  db.User.findOne({ where: { id } })
-    .then((result) => {
-      result.isTipAdmin = result.isTipAdmin ? "1" : "0";
+app.get(
+  "/:id",
+  async (req, res) => {
+    const id = req.params.id;
+    db.User.findOne({ where: { id } })
+      .then((result) => {
+        result.isTipAdmin = result.isTipAdmin ? "1" : "0";
 
-      return res.json({
-        type: true,
-        user: result,
+        return res.json({
+          type: true,
+          user: result,
+        });
+      })
+      .catch((e) => {
+        return res.json({
+          type: false,
+          data: e.toString(),
+        });
       });
-    })
-    .catch((e) => {
-      return res.json({
-        type: false,
-        data: e.toString(),
-      });
-    });
-});
+  }
+);
+
+
 
 // update password
-app.put(
-  "/change-password",
-  auth([UserRolls.Admin, UserRolls.User]),
-  async (req, res) => {
-    let { oldPass, newPass } = req.body;
+app.put("/change-password",auth([UserRolls.Admin,UserRolls.User]), async (req, res) => {
 
-    console.log(oldPass, newPass);
-    // Search user
-    db.User.findOne({
-      where: {
-        email: req.user.email,
-      },
-    })
-      .then((user) => {
+  let { oldPass,newPass} = req.body;
+
+  console.log(oldPass,newPass)
+  // Search user
+  db.User.findOne({
+    where: {
+      email : req.user.email,
+    },
+  })
+    .then((user) => {
         if (bcrypt.compareSync(oldPass, user.password)) {
+
+
           // new password hashing
           let uptPassword = bcrypt.hashSync(
             newPass,
             Number.parseInt(authConfig.rounds)
           );
-          db.User.update(
-            {
-              password: uptPassword,
+          db.User.update({
+
+            password : uptPassword,
+          },{
+            where:{
+              email : req.user.email
             },
-            {
-              where: {
-                email: req.user.email,
-              },
-              returning: true,
-            }
-          )
-            .then((newUser) => {
-              //We create the token
-              let token = jwt.sign({ user: newUser }, authConfig.secret, {
-                expiresIn: authConfig.expires,
-              });
+            returning: true,
+          }).then((newUser)=>{
 
-              newUser.password = "";
-
-              return res.json({
-                user: newUser,
-                token: token,
-              });
-            })
-            .catch((err) => {
-              return res.status(500).json(err);
+             //We create the token
+            let token = jwt.sign({ user: newUser }, authConfig.secret, {
+              expiresIn: authConfig.expires,
             });
+
+            newUser.password = ""
+            
+            return res.json({
+              user: newUser,
+              token: token,
+            });
+
+          }).catch((err)=>{
+            return res.status(500).json(err);
+          })
+         
         } else {
           // Unauthorized Access
           return res.status(401).json({ msg: "There is no matching" });
         }
+
+    })
+    .catch((err) => {
+      return res.status(500).json(err);
+    });
+});
+
+
+
+
+//update user
+app.put(
+  "/:id",
+  async (req, res) => {
+    const id = req.params.id;
+
+    let password = bcrypt.hashSync(
+      req.body.user.email.substr(5),
+      Number.parseInt(authConfig.rounds)
+    );
+    req.body.user.password = password;
+    db.User.update(req.body.user, { where: { id: id }, paranoid: false })
+      .then((result) => {
+        return res.json({
+          type: true,
+          data: "User Updated",
+        });
       })
-      .catch((err) => {
-        return res.status(500).json(err);
+      .catch((e) => {
+        return res.status(500).json({
+          type: false,
+          data: e.toString(),
+        });
       });
   }
 );
-
-//update user
-app.put("/:id", async (req, res) => {
-  const id = req.params.id;
-
-  let password = bcrypt.hashSync(
-    req.body.user.email.substr(5),
-    Number.parseInt(authConfig.rounds)
-  );
-  req.body.user.password = password;
-  db.User.update(req.body.user, { where: { id: id }, paranoid: false })
-    .then((result) => {
-      return res.json({
-        type: true,
-        data: "User Updated",
-      });
-    })
-    .catch((e) => {
-      return res.status(500).json({
-        type: false,
-        data: e.toString(),
-      });
-    });
-});
 
 //sign up
 app.post("/register", async (req, res) => {
@@ -145,7 +164,7 @@ app.post("/register", async (req, res) => {
     email: data.email,
     role: 1,
     password: password,
-    username: data.username,
+    username : data.username
   })
     .then((user) => {
       // We create the token
@@ -153,7 +172,7 @@ app.post("/register", async (req, res) => {
         expiresIn: authConfig.expires,
       });
 
-      user.password = "";
+      user.password  = ""
 
       return res.json({
         user: user,
@@ -175,27 +194,29 @@ app.post("/login", async (req, res) => {
     },
   })
     .then((user) => {
-      if (bcrypt.compareSync(password, user.password)) {
-        //We create the token
-        let token = jwt.sign({ user: user }, authConfig.secret, {
-          expiresIn: authConfig.expires,
-        });
+        if (bcrypt.compareSync(password, user.password)) {
+          //We create the token
+          let token = jwt.sign({ user: user }, authConfig.secret, {
+            expiresIn: authConfig.expires,
+          });
 
-        user.password = "";
+          user.password = ""
+          
+          return res.json({
+            user: user,
+            token: token,
+          });
+        } else {
+          // Unauthorized Access
+          return res.status(401).json({ msg: "Incorrect password" });
+        }
 
-        return res.json({
-          user: user,
-          token: token,
-        });
-      } else {
-        // Unauthorized Access
-        return res.status(401).json({ msg: "Incorrect password" });
-      }
     })
     .catch((err) => {
       return res.status(500).json(err);
     });
 });
+
 
 app.post("/login-admin", async (req, res) => {
   let { email, password } = req.body;
@@ -203,30 +224,33 @@ app.post("/login-admin", async (req, res) => {
   db.User.findOne({
     where: {
       email,
-      role: 0,
+      role:0,
     },
   })
     .then((user) => {
-      if (bcrypt.compareSync(password, user.password)) {
-        //We create the token
-        let token = jwt.sign({ user: user }, authConfig.secret, {
-          expiresIn: authConfig.expires,
-        });
+        if (bcrypt.compareSync(password, user.password)) {
+          //We create the token
+          let token = jwt.sign({ user: user }, authConfig.secret, {
+            expiresIn: authConfig.expires,
+          });
 
-        user.password = "";
+          user.password = ""
+          
+          return res.json({
+            user: user,
+            token: token,
+          });
+        } else {
+          // Unauthorized Access
+          return res.status(401).json({ msg: "Incorrect password" });
+        }
 
-        return res.json({
-          user: user,
-          token: token,
-        });
-      } else {
-        // Unauthorized Access
-        return res.status(401).json({ msg: "Incorrect password" });
-      }
     })
     .catch((err) => {
       return res.status(500).json(err);
     });
 });
+
+
 
 module.exports = app;

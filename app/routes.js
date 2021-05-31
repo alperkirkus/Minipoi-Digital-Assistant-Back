@@ -7,7 +7,7 @@ const express = require("express");
 const router = express.Router();
 
 // Home Default
-router.get("/", (req, res) => res.json({ MINIPOI: "ACTIVE" }));
+router.get("/", (req, res) => res.json({ KITE: "ACTIVE" }));
 
 //uploads
 router.use("/files", express.static("uploads"));
