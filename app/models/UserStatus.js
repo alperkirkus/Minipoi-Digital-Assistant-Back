@@ -1,17 +1,18 @@
-'use strict';
+"use strict";
 
 module.exports = (sequelize, DataTypes) => {
-
-  const UStat = sequelize.define('UStat', {
-    id: {
+  const UStat = sequelize.define(
+    "UStat",
+    {
+      id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: DataTypes.INTEGER
+        type: DataTypes.INTEGER,
       },
       userId: {
         type: DataTypes.INTEGER,
-        references: { model: 'users', key: 'id' }
+        references: { model: "users", key: "id" },
       },
       attainmentName: {
         type: DataTypes.STRING,
@@ -19,16 +20,16 @@ module.exports = (sequelize, DataTypes) => {
       attainmentAmount: {
         type: DataTypes.REAL,
       },
-      attainmentDescription:{
-        type: DataTypes.STRING
+      attainmentDescription: {
+        type: DataTypes.STRING,
       },
-
-  }, {
-    tableName: "userstatus",
-    paranoid: true,
-    timestamps: true,
-  });
-
+    },
+    {
+      tableName: "userstatus",
+      paranoid: false,
+      timestamps: false,
+    }
+  );
 
   UStat.associate = (models) => {
     UStat.belongsTo(models.User, {

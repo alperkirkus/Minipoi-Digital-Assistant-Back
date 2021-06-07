@@ -17,27 +17,12 @@ const app = express.Router();
 
 //**************Route Level 1
 
-app.get("/all", async (req, res) => {
-  db.Book.findAll()
-    .then((books) => {
-      return res.json({
-        type: true,
-        books,
-      });
-    })
-    .catch((e) => {
-      return res.json({
-        type: false,
-        data: e.toString(),
-      });
-    });
-});
-
-//get user book by id
-app.get("/:userId", async (req, res) => {
-  db.UBook.findAll({
+//get user book ex by id
+app.get("/:bookId", async (req, res) => {
+  db.BookEx.findAll({
+    order: [["exerciseOrderNo", "ASC"]],
     where: {
-      userId: req.params.userId,
+      bookId: req.params.bookId,
     },
     include: [
       {
@@ -47,10 +32,10 @@ app.get("/:userId", async (req, res) => {
       },
     ],
   })
-    .then((ubook) => {
+    .then((bookex) => {
       return res.json({
         type: true,
-        ubook: ubook,
+        bookex: bookex,
       });
     })
     .catch((e) => {
