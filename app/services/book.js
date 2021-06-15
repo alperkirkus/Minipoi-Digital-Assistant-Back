@@ -17,8 +17,17 @@ const app = express.Router();
 
 //**************Route Level 1
 
-app.get("/all", async (req, res) => {
-  db.Book.findAll()
+
+
+
+
+app.get(
+  "/all",
+  async (req, res) => {
+   
+    db.Book.findAll({
+      order:[['id','ASC']]
+    })
     .then((books) => {
       return res.json({
         type: true,
@@ -31,22 +40,26 @@ app.get("/all", async (req, res) => {
         data: e.toString(),
       });
     });
-});
+  }
+  
+);
 
 //get user book by id
-app.get("/:userId", async (req, res) => {
-  db.UBook.findAll({
-    where: {
-      userId: req.params.userId,
-    },
-    include: [
-      {
-        model: db.Book,
-        as: "books",
-        required: true,
+app.get(
+  "/:userId",
+  async (req, res) => {
+   
+
+    db.UBook.findAll({
+      where:{
+        userId :  req.params.userId
       },
-    ],
-  })
+      include : [{
+        model: db.Book,
+        as : "books",
+        required: true
+       }]
+    })
     .then((ubook) => {
       return res.json({
         type: true,
@@ -59,6 +72,65 @@ app.get("/:userId", async (req, res) => {
         data: e.toString(),
       });
     });
-});
+  }
+  
+);
+
+
+app.post(
+  "/add",
+  async (req, res) => {
+   
+
+    const {bookName} = req.body
+    db.Book.create({
+      bookName ,
+    })
+    .then(() => {
+      return res.json({
+        type: true,
+
+      });
+    })
+    .catch((e) => {
+      return res.json({
+        type: false,
+        data: e.toString(),
+      });
+    });
+  }
+  
+);
+
+
+app.put(
+  "/update",
+  async (req, res) => {
+   
+
+    const {bookName,id} = req.body
+    db.Book.update({
+      bookName ,
+    },{
+      where:{
+        id,
+      }
+    })
+    .then(() => {
+      return res.json({
+        type: true,
+
+      });
+    })
+    .catch((e) => {
+      return res.json({
+        type: false,
+        data: e.toString(),
+      });
+    });
+  }
+  
+);
+
 
 module.exports = app;

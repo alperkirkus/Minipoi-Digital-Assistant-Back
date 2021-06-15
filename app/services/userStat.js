@@ -17,64 +17,18 @@ const app = express.Router();
 
 //**************Route Level 1
 
-//add book with code
-app.post("/add-book", async (req, res) => {
-  const { userId, code } = req.body;
-
-  let usedCode = code;
-  db.Code.findOne({
+//get user book ex by id
+app.get("/:userId", async (req, res) => {
+  db.UStat.findAll({
     where: {
-      bookRegistrationCode: code,
-      isUsed: false,
+      userId: req.params.userId,
     },
   })
-    .then((code) => {
-      if (code) {
-        db.UBook.findOne({
-          where: {
-            bookId: code.bookId,
-            userId,
-          },
-        }).then((ubook) => {
-          if (ubook) {
-            return res.json({
-              type: false,
-              msg: "Code already uses",
-            });
-          } else {
-            db.UBook.create({
-              userId,
-              bookId: code.bookId,
-            })
-              .then(() => {
-                db.Code.update(
-                  { isUsed: true },
-                  {
-                    where: {
-                      bookRegistrationCode: usedCode,
-                    },
-                  }
-                ).then(() => {
-                  return res.json({
-                    type: true,
-                    msg: "success",
-                  });
-                });
-              })
-              .catch((e) => {
-                return res.json({
-                  type: false,
-                  data: e.toString(),
-                });
-              });
-          }
-        });
-      } else {
-        return res.json({
-          type: false,
-          msg: "Code already uses",
-        });
-      }
+    .then((ex) => {
+      return res.json({
+        type: true,
+        ex,
+      });
     })
     .catch((e) => {
       return res.json({
@@ -84,23 +38,51 @@ app.post("/add-book", async (req, res) => {
     });
 });
 
-app.post("/add", async (req, res) => {
-  const { bookId, codes } = req.body;
-  //preparing
+app.put("/stat-update", async (req, res) => {
+  const { amount, userId, name } = req.body;
 
-  let data = [];
-  codes.forEach((el) => {
-    data.push({
-      bookRegistrationCode: el,
-      bookId,
-    });
-  });
+  db.UStat.findOne({
+    where: {
+      userId,
+      attainmentName: name.trim(),
+    },
+  })
+    .then((att) => {
 
-  db.Code.bulkCreate(data)
-    .then(() => {
-      return res.json({
-        type: true,
-      });
+        if(att)
+        {
+
+            db.UStat.update(
+                {
+                  attainmentAmount: att.attainmentAmount + amount,
+                },
+                {
+                  where: {
+                    userId,
+                    attainmentName: name.trim(),
+                  },
+                }
+              )
+                .then((ret) => {
+                  return res.json({
+                    type: true,
+                    ret,
+                  });
+                })
+                .catch((e) => {
+                  return res.json({
+                    type: false,
+                    data: e.toString(),
+                  });
+                });
+        }
+        else{
+            return res.json({
+                type: false,
+                data:"not found",
+              });
+        }
+    
     })
     .catch((e) => {
       return res.json({
