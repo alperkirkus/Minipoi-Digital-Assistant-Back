@@ -48,41 +48,36 @@ app.put("/stat-update", async (req, res) => {
     },
   })
     .then((att) => {
-
-        if(att)
-        {
-
-            db.UStat.update(
-                {
-                  attainmentAmount: att.attainmentAmount + amount,
-                },
-                {
-                  where: {
-                    userId,
-                    attainmentName: name.trim(),
-                  },
-                }
-              )
-                .then((ret) => {
-                  return res.json({
-                    type: true,
-                    ret,
-                  });
-                })
-                .catch((e) => {
-                  return res.json({
-                    type: false,
-                    data: e.toString(),
-                  });
-                });
-        }
-        else{
+      if (att) {
+        db.UStat.update(
+          {
+            attainmentAmount: att.attainmentAmount + amount,
+          },
+          {
+            where: {
+              userId,
+              attainmentName: name.trim(),
+            },
+          }
+        )
+          .then((ret) => {
             return res.json({
-                type: false,
-                data:"not found",
-              });
-        }
-    
+              type: true,
+              ret,
+            });
+          })
+          .catch((e) => {
+            return res.json({
+              type: false,
+              data: e.toString(),
+            });
+          });
+      } else {
+        return res.json({
+          type: false,
+          data: "not found",
+        });
+      }
     })
     .catch((e) => {
       return res.json({

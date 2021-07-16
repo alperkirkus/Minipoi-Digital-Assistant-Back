@@ -17,17 +17,11 @@ const app = express.Router();
 
 //**************Route Level 1
 
-
-
-
-
-app.get(
-  "/all",
-  async (req, res) => {
-   
-    db.Book.findAll({
-      order:[['id','ASC']]
-    })
+// To get all books
+app.get("/all", async (req, res) => {
+  db.Book.findAll({
+    order: [["id", "ASC"]],
+  })
     .then((books) => {
       return res.json({
         type: true,
@@ -40,26 +34,22 @@ app.get(
         data: e.toString(),
       });
     });
-  }
-  
-);
+});
 
 //get user book by id
-app.get(
-  "/:userId",
-  async (req, res) => {
-   
-
-    db.UBook.findAll({
-      where:{
-        userId :  req.params.userId
-      },
-      include : [{
+app.get("/:userId", async (req, res) => {
+  db.UBook.findAll({
+    where: {
+      userId: req.params.userId,
+    },
+    include: [
+      {
         model: db.Book,
-        as : "books",
-        required: true
-       }]
-    })
+        as: "books",
+        required: true,
+      },
+    ],
+  })
     .then((ubook) => {
       return res.json({
         type: true,
@@ -72,24 +62,16 @@ app.get(
         data: e.toString(),
       });
     });
-  }
-  
-);
+});
 
-
-app.post(
-  "/add",
-  async (req, res) => {
-   
-
-    const {bookName} = req.body
-    db.Book.create({
-      bookName ,
-    })
+app.post("/add", async (req, res) => {
+  const { bookName } = req.body;
+  db.Book.create({
+    bookName,
+  })
     .then(() => {
       return res.json({
         type: true,
-
       });
     })
     .catch((e) => {
@@ -98,28 +80,23 @@ app.post(
         data: e.toString(),
       });
     });
-  }
-  
-);
+});
 
-
-app.put(
-  "/update",
-  async (req, res) => {
-   
-
-    const {bookName,id} = req.body
-    db.Book.update({
-      bookName ,
-    },{
-      where:{
+app.put("/update", async (req, res) => {
+  const { bookName, id } = req.body;
+  db.Book.update(
+    {
+      bookName,
+    },
+    {
+      where: {
         id,
-      }
-    })
+      },
+    }
+  )
     .then(() => {
       return res.json({
         type: true,
-
       });
     })
     .catch((e) => {
@@ -128,9 +105,6 @@ app.put(
         data: e.toString(),
       });
     });
-  }
-  
-);
-
+});
 
 module.exports = app;
